@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Cathy</string>
+    <string name="rejectPermission">权限被拒绝了</string>
+    <string name="pre">上一曲</string>
+    <string name="play">播放</string>
+    <string name="pause">暂停</string>
+    <string name="next">下一曲</string>
+</resources>
