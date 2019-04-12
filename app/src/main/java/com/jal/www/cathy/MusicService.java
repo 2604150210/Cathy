@@ -1,12 +1,10 @@
 package com.jal.www.cathy;
 
 import android.app.Service;
-import android.content.Context;
 import android.content.Intent;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.Binder;
-import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
 
@@ -14,11 +12,11 @@ import java.io.IOException;
 import java.util.List;
 
 public class MusicService extends Service {
-    private static final String TAG = "LogMusicService";
-    private MediaPlayer player;
-    private Music music;
-    private List<Music>musicList;
-    private int position;
+    private static final String TAG = "JalLog::MusicService";
+    private MediaPlayer mPlayer;
+    private Music mMusic;
+    private List<Music> mMusicList;
+    private int mPosition;
     public MusicService() {
     }
 
@@ -26,87 +24,87 @@ public class MusicService extends Service {
     public void onCreate() {
         Log.i(TAG, "MusicService :: onCreate()");
         super.onCreate();
-        musicList = MusicList.getMusicList(getApplicationContext());
+        mMusicList = MusicList.getMusicList(getApplicationContext());
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.i(TAG, "MusicService :: onStartCommand()");
-        position = intent.getExtras().getInt("position");
-        playIndex(position);
+        mPosition = intent.getExtras().getInt("mPosition");
+        playIndex(mPosition);
         return super.onStartCommand(intent, flags, startId);
     }
 
     public class MyBinder extends Binder {
 
         public boolean isPlaying(){
-            return player.isPlaying();
+            return mPlayer.isPlaying();
         }
         public boolean isNullOfPlayer(){
-            return player == null;
+            return mPlayer == null;
         }
         public void play_pause() {
-            if (player.isPlaying()) {
-                player.pause();
+            if (mPlayer.isPlaying()) {
+                mPlayer.pause();
                 Log.i(TAG, "Play stop");
             } else {
-                player.start();
+                mPlayer.start();
                 Log.i(TAG, "Play start");
             }
         }
 
         public void pre(){
-            position = (position - 1 + musicList.size()) % musicList.size();
-            playIndex(position);
+            mPosition = (mPosition - 1 + mMusicList.size()) % mMusicList.size();
+            playIndex(mPosition);
         }
 
         public void next(){
-            position = (position + 1) % musicList.size();
-            playIndex(position);
+            mPosition = (mPosition + 1) % mMusicList.size();
+            playIndex(mPosition);
         }
 
         public int getPosition(){
-            return position;
+            return mPosition;
         }
-        //Returns the length of the music in milliseconds
+        //Returns the length of the mMusic in milliseconds
         public int getDuration(){
-            return player.getDuration();
+            return mPlayer.getDuration();
         }
 
-        //Return the name of the music
+        //Return the name of the mMusic
         public String getName(){
-            return music.getName();
+            return mMusic.getName();
         }
 
-        //Returns the current progress of the music in milliseconds
+        //Returns the current progress of the mMusic in milliseconds
         public int getCurrenPostion(){
-            return player.getCurrentPosition();
+            return mPlayer.getCurrentPosition();
         }
 
-        //Set the progress of music playback in milliseconds
+        //Set the progress of mMusic playback in milliseconds
         public void seekTo(int mesc){
-            player.seekTo(mesc);
+            mPlayer.seekTo(mesc);
         }
     }
 
     private void playIndex(int position) {
-        if (null == player){
-            player = new MediaPlayer();
+        if (null == mPlayer){
+            mPlayer = new MediaPlayer();
         }
-        if (music == musicList.get(position)){
-            return;// continue play this music.
+        if (mMusic == mMusicList.get(position)){
+            return;// continue play this mMusic.
         }
 
-        player.reset();
-        music = musicList.get(position);
-        player.setAudioStreamType(AudioManager.STREAM_MUSIC);
+        mPlayer.reset();
+        mMusic = mMusicList.get(position);
+        mPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
         try {
-            player.setDataSource(music.getUrl());
-            player.prepare();
+            mPlayer.setDataSource(mMusic.getUrl());
+            mPlayer.prepare();
         } catch (IOException e) {
             e.printStackTrace();
         }
-        player.start();
+        mPlayer.start();
     }
 
     @Override

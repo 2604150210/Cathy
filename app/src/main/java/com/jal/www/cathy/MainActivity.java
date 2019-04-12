@@ -18,26 +18,24 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import com.orhanobut.logger.Logger;
-
 import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
-    private static final String TAG = "MainActivityLog";
-    private MyConnection myConnection;
-    private MusicService.MyBinder myBinder;
-    private List<Music>musicList;
-    private ListView listView;
-    private Context context;
-    private int positionOfPlaying;
+    private static final String TAG = "JalLog::MainActivity";
+    private MyConnection mConnection;
+    private MusicService.MyBinder mBinder;
+    private List<Music> mMusicList;
+    private ListView mListView;
+    private Context mContext;
+    private int mPpositionOfPlaying;
     class MyConnection implements ServiceConnection {
 
         private static final String TAG = "LogMyConnection";
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             Log.i(TAG, "onServiceConnected");
-            myBinder = (MusicService.MyBinder) service;
+            mBinder = (MusicService.MyBinder) service;
             showListView();
         }
 
@@ -51,7 +49,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Log.i(TAG, "MainActivity :: onCreate()");
-        context = this;
+        mContext = this;
         requestPermission();
     }
 
@@ -73,9 +71,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initView() {
-        listView = findViewById(R.id.listView);
-        musicList = MusicList.getMusicList(this);
-        if (myBinder == null){//myBinder is null that is what bindService is not finish
+        mListView = findViewById(R.id.listView);
+        mMusicList = MusicList.getMusicList(this);
+        if (mBinder == null){//mBinder is null that is what bindService is not finish
             bindMusicService();
         }else{
             showListView();
@@ -83,14 +81,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void showListView() {
-        if ( myBinder == null || myBinder.isNullOfPlayer()){
-            positionOfPlaying = -1;
+        if ( mBinder == null || mBinder.isNullOfPlayer()){
+            mPpositionOfPlaying = -1;
         } else {
-            positionOfPlaying = myBinder.getPosition();
+            mPpositionOfPlaying = mBinder.getPosition();
         }
-        MusicAdapter adapter = new MusicAdapter(this, musicList,positionOfPlaying);
-        listView.setAdapter(adapter);
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        MusicAdapter adapter = new MusicAdapter(this, mMusicList, mPpositionOfPlaying);
+        mListView.setAdapter(adapter);
+        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent intent = new Intent();
@@ -106,9 +104,9 @@ public class MainActivity extends AppCompatActivity {
     private void bindMusicService() {
         Intent intent = new Intent();
         intent.setClass(this, MusicService.class);
-        myConnection = new MyConnection();
-        bindService(intent, myConnection, BIND_AUTO_CREATE);
-        Log.i(TAG, "myBinder:"+myBinder);
+        mConnection = new MyConnection();
+        bindService(intent, mConnection, BIND_AUTO_CREATE);
+        Log.i(TAG, "mBinder:"+ mBinder);
     }
 
 
