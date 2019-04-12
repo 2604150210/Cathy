@@ -24,13 +24,14 @@ public class MusicService extends Service {
 
     @Override
     public void onCreate() {
-        Log.i(TAG, "onCreate");
+        Log.i(TAG, "MusicService :: onCreate()");
         super.onCreate();
         musicList = MusicList.getMusicList(getApplicationContext());
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        Log.i(TAG, "MusicService :: onStartCommand()");
         position = intent.getExtras().getInt("position");
         playIndex(position);
         return super.onStartCommand(intent, flags, startId);
@@ -119,4 +120,17 @@ public class MusicService extends Service {
         Log.i(TAG, "MusicService :: onDestroy()");
         super.onDestroy();
     }
+
+    @Override
+    public boolean onUnbind(Intent intent) {
+        Log.i(TAG, "MusicService :: onUnbind()");
+        return super.onUnbind(intent);
+    }
+
+    @Override
+    public void onRebind(Intent intent) {
+        Log.i(TAG, "MusicService :: onUnbind()");
+        super.onRebind(intent);
+    }
+
 }

@@ -1,30 +1,24 @@
 package com.jal.www.cathy;
 
 import android.Manifest;
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
-import android.app.Service;
-import android.content.ContentResolver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
-import android.graphics.BitmapFactory;
-import android.provider.MediaStore;
+import android.os.Bundle;
+import android.os.IBinder;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.Adapter;
 import android.widget.AdapterView;
-import android.widget.Button;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Toast;
+
+import com.orhanobut.logger.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,10 +31,26 @@ public class MainActivity extends AppCompatActivity {
     private ListView listView;
     private Context context;
     private int positionOfPlaying;
+    class MyConnection implements ServiceConnection {
+
+        private static final String TAG = "LogMyConnection";
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            Log.i(TAG, "onServiceConnected");
+            myBinder = (MusicService.MyBinder) service;
+            showListView();
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            Log.i(TAG, "onServiceDisconnected");
+        }
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        Log.i(TAG, "MainActivity :: onCreate()");
         context = this;
         requestPermission();
     }
@@ -63,19 +73,21 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initView() {
-        Intent intent = new Intent();
-        intent.setClass(this, MusicService.class);
-        myConnection = new MyConnection();
-        bindService(intent, myConnection, BIND_AUTO_CREATE);
-        myBinder = myConnection.myBinder;
-        if (myBinder == null)Log.i(TAG, "myBinder is null");
-        if (myBinder.isNullOfPlayer()){
+        listView = findViewById(R.id.listView);
+        musicList = MusicList.getMusicList(this);
+        if (myBinder == null){//myBinder is null that is what bindService is not finish
+            bindMusicService();
+        }else{
+            showListView();
+        }
+    }
+
+    private void showListView() {
+        if ( myBinder == null || myBinder.isNullOfPlayer()){
             positionOfPlaying = -1;
         } else {
             positionOfPlaying = myBinder.getPosition();
         }
-        listView = findViewById(R.id.listView);
-        musicList = MusicList.getMusicList(this);
         MusicAdapter adapter = new MusicAdapter(this, musicList,positionOfPlaying);
         listView.setAdapter(adapter);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -89,6 +101,14 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+    }
+
+    private void bindMusicService() {
+        Intent intent = new Intent();
+        intent.setClass(this, MusicService.class);
+        myConnection = new MyConnection();
+        bindService(intent, myConnection, BIND_AUTO_CREATE);
+        Log.i(TAG, "myBinder:"+myBinder);
     }
 
 
@@ -119,5 +139,36 @@ public class MainActivity extends AppCompatActivity {
     protected void onDestroy() {
         Log.i(TAG, "MainActivity :: onDestroy()");
         super.onDestroy();
+    }
+
+    @Override
+    protected void onStart() {
+        Log.i(TAG, "MainActivity :: onStart()");
+        super.onStart();
+    }
+
+    @Override
+    protected void onStop() {
+        Log.i(TAG, "MainActivity :: onStop()");
+        super.onStop();
+    }
+
+    @Override
+    protected void onPause() {
+        Log.i(TAG, "MainActivity :: onPause()");
+        super.onPause();
+    }
+
+    @Override
+    protected void onRestart() {
+        Log.i(TAG, "MainActivity :: onRestart()");
+        super.onRestart();
+    }
+
+    @Override
+    protected void onResume() {
+        Log.i(TAG, "MainActivity :: onResume()");
+        super.onResume();
+        initView();
     }
 }
